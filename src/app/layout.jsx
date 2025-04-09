@@ -1,5 +1,8 @@
+
+
 import Navbar from '@/components/Navbar';
 import CursorScript from '@/components/CursorScript';
+
 import { Barlow_Semi_Condensed, Montserrat, Borel } from 'next/font/google';
 import 'bootstrap/dist/css/bootstrap.min.css';
 import './globals.css';
@@ -36,14 +39,22 @@ export const metadata = {
     },
 };
 
+
+
+
+
 export default function RootLayout({ children }) {
+
+
+
     return (
-        <html lang="en" className={`${barlow.variable} ${montserrat.variable} ${borel.variable}`}>
+        <html lang="en" data-bs-theme="dark" className={`${barlow.variable} ${montserrat.variable} ${borel.variable}`}>
             <body>
                 <div id='cursor'></div>
                 <Navbar />
                 {children}
                 <CursorScript />
+
             </body>
         </html>
     );
