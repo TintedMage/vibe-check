@@ -5,23 +5,12 @@ import styles from './page.module.css';
 import Mic from '@/components/Mic';
 import Transcript from '@/components/Transcript';
 
-
 export default function Home() {
     const [finalTranscript, setFinalTranscript] = useState('');
     const [interimTranscript, setInterimTranscript] = useState('');
     const [listening, setListening] = useState(false);
     const [moodData, setMoodData] = useState({ sentiment: '', confidence: 0 });
     const [fetchData, setFetchData] = useState(false);
-
-    const [apiKey, setApiKey] = useState('');
-
-    // Check for API key on mount
-    useEffect(() => {
-        const savedKey = Cookies.get('huggingface_api_key');
-        if (savedKey) {
-            setApiKey(savedKey);
-        }
-    }, []);
 
     const getData = useCallback(async () => {
         if (!finalTranscript.trim()) {

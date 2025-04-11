@@ -1,8 +1,7 @@
 
-
+import { SpeedInsights } from "@vercel/speed-insights/next"
 import Navbar from '@/components/Navbar';
 import CursorScript from '@/components/CursorScript';
-import { SpeedInsights } from "@vercel/speed-insights/next"
 
 
 import { Barlow_Semi_Condensed, Montserrat, Borel } from 'next/font/google';
