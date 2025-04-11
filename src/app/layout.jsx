@@ -2,6 +2,8 @@
 
 import Navbar from '@/components/Navbar';
 import CursorScript from '@/components/CursorScript';
+import { SpeedInsights } from "@vercel/speed-insights/next"
+
 
 import { Barlow_Semi_Condensed, Montserrat, Borel } from 'next/font/google';
 import 'bootstrap/dist/css/bootstrap.min.css';
@@ -54,7 +56,7 @@ export default function RootLayout({ children }) {
                 <Navbar />
                 {children}
                 <CursorScript />
-
+                <SpeedInsights />
             </body>
         </html>
     );
