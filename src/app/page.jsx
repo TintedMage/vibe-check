@@ -4,7 +4,7 @@ import { useState, useEffect, useCallback } from 'react';
 import styles from './page.module.css';
 import Mic from '@/components/Mic';
 import Transcript from '@/components/Transcript';
-import Cookies from 'js-cookie';
+
 
 export default function Home() {
     const [finalTranscript, setFinalTranscript] = useState('');
