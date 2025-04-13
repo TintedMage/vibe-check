@@ -1,6 +1,7 @@
 import { NextResponse } from 'next/server';
 
 export async function POST(request) {
+    console.log('Received request for sentiment analysis');
     try {
         const { text } = await request.json();
 
