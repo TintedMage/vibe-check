@@ -81,7 +81,6 @@ export default function Home() {
 
     return (
         <div className={`${styles.container} container pt-5 mt-5`}>
-            <h1>hello shaina</h1>
             <div className="row justify-content-center">
                 <div className="col-12 text-center">
                     <h1 className={`${styles.heading} pt-5`}>Vibe Check</h1>
