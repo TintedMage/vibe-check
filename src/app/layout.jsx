@@ -46,6 +46,7 @@ export const metadata = {
 
 export default function RootLayout({ children }) {
 
+    
 
 
     return (
@@ -56,6 +57,8 @@ export default function RootLayout({ children }) {
                 {children}
                 <CursorScript />
                 <SpeedInsights />
+
+
             </body>
         </html>
     );
