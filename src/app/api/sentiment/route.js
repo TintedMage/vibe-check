@@ -1,7 +1,15 @@
 import { NextResponse } from 'next/server';
 
+import { cookies } from 'next/headers';
+
 export async function POST(request) {
     console.log('Received request for sentiment analysis');
+
+    const cookieStore = cookies();
+    const apiKey = cookieStore.get('apiKey')?.value || process.env.HUGGING_FACE_API_KEY;
+    console.log('API Key:', apiKey);
+
+
     try {
         const { text } = await request.json();
 
@@ -15,7 +23,7 @@ export async function POST(request) {
             {
                 method: "POST",
                 headers: {
-                    "Authorization": `Bearer ${process.env.HUGGING_FACE_API_KEY}`,
+                    "Authorization": `Bearer ${apiKey}`,
                     "Content-Type": "application/json"
                 },
                 body: JSON.stringify({ inputs: text })

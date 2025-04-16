@@ -1,36 +1,158 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+# Comprehensive Guide to the Vibe Check Web Application
 
-## Getting Started
+## 1. Technical Stack & Architecture Overview
 
-First, run the development server:
+Vibe Check is a web application built with modern technologies that performs real-time sentiment analysis on spoken words. Here's a breakdown of the technical foundation:
 
-```bash
-npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
+- **Framework**: Built with Next.js (React-based framework) using the App Router architecture
+- **Frontend**: JavaScript with React components and hooks for state management
+- **Styling**: Combination of CSS Modules (for component scoping) and Bootstrap (for responsive layout)
+- **API Integration**: Hugging Face AI models for sentiment analysis
+- **Authentication**: Custom API key system with secure cookie storage
+- **Storage**: LocalStorage for tracking usage credits
+
+## 2. Core Functionality
+
+The application provides these main functions:
+
+- **Speech Recognition**: Captures spoken words through the device microphone
+- **Transcription**: Displays real-time transcription of speech
+- **Sentiment Analysis**: Analyzes the emotional tone of the speech
+- **Credit System**: Limits free usage to encourage API key registration
+
+## 3. Component Architecture
+
+The application is built with these key components:
+
+### Main Components
+- **Home**: The main page component that orchestrates all functionality
+- **Mic**: Custom microphone component that handles speech recognition
+- **Transcript**: Displays transcribed text with copy functionality
+- **FirstVisitAlert**: Provides new user guidance
+- **Settings**: Manages user's API key for unlimited usage
+
+### Server Components
+- **API Routes**: Next.js API routes for secure communication with external services
+- **Server Actions**: Modern Next.js actions for secure form handling (setApiCookie.js)
+
+## 4. Technical Implementation Details
+
+### Speech Recognition Implementation
+The speech recognition is implemented using the Web Speech API.
+```javascript
+// In Mic.jsx
+const recognition = new webkitSpeechRecognition();
+recognition.continuous = true;      // Don't stop after first result
+recognition.interimResults = true;  // Get results while speaking
+recognition.lang = 'en-US';         // Set language
 ```
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+### Credit System Implementation
+The application tracks usage with a credit system.
+```javascript
+// Initialize credits from localStorage on component mount
+useEffect(() => {
+    try {
+        if (!initialLoadDone.current) {
+            const storedCredits = localStorage.getItem('creditsUsed');
+            const parsedCredits = storedCredits ? parseInt(storedCredits, 10) : 0;
+            setCreditsUsed(isNaN(parsedCredits) ? 0 : parsedCredits);
+            initialLoadDone.current = true;
+        }
+    } catch (error) {
+        console.error('Error accessing localStorage:', error);
+    }
+}, []);
+```
 
-You can start editing the page by modifying `app/page.js`. The page auto-updates as you edit the file.
+### Sentiment Analysis API Integration
+Analysis is performed by sending the text to Hugging Face API.
+```javascript
+const response = await fetch('/api/sentiment', {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({ text: finalTranscript }),
+});
+```
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+### API Key Management
+API keys are securely stored using HTTP-only cookies.
+```javascript
+// In setApiCookie.js
+cookies().set("apiKey", apiKey, {
+    httpOnly: true,     // Prevents JavaScript access
+    secure: process.env.NODE_ENV === "production",
+    sameSite: "strict", // Prevents CSRF
+    maxAge: 30 * 24 * 60 * 60, // 30 days
+    path: "/",
+});
+```
 
-## Learn More
+## 5. User Experience & UI Design
 
-To learn more about Next.js, take a look at the following resources:
+### Responsive Design
+The app uses Bootstrap's responsive grid system and custom CSS to ensure a good experience on different devices.
+```jsx
+<div className={`${styles.container} container pt-5 mt-5`}>
+    <div className="row justify-content-center">
+        {/* Responsive column layout */}
+    </div>
+</div>
+```
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
+### Visual Feedback
+Color-coded sentiment results provide immediate understanding.
+```javascript
+const getMoodColor = (label) => {
+    const colors = {
+        positive: '#28a745',
+        negative: '#dc3545',
+    };
+    return colors[label?.toLowerCase()] || '#007bff';
+};
+```
 
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
+### Custom Cursor Effects
+A unique cursor enhances the UI experience.
 
-## Deploy on Vercel
+## 6. Advanced Features
 
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
+### Browser Compatibility Checks
+The application checks for API support and browser compatibility.
 
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+### Usage Limitations & Monetization Strategy
+Free tier users get 10 credits, then must provide their own API key.
+```javascript
+const MAX_FREE_CREDITS = 10;
+
+// Check if credits are exhausted
+if (creditsUsed >= MAX_FREE_CREDITS) {
+    console.log('No credits remaining');
+    return false; // Prevent recording
+}
+```
+
+### State Management
+React hooks manage the application state.
+```javascript
+const [apiKey, setApiKey] = useState(false);
+const [creditsUsed, setCreditsUsed] = useState(0);
+const [finalTranscript, setFinalTranscript] = useState('');
+// ...etc
+```
+
+## 7. Deployment & Performance
+The site is built to be deployed on Vercel's platform. Performance optimizations include:
+- Server components where appropriate
+- Client components only where interactivity is needed
+- Lazy loading of heavy components
+- Optimized asset loading
+
+## 8. Security Considerations
+- API keys are stored in HTTP-only cookies for protection
+- Server-side API calls protect the API key from client exposure
+- Form validation prevents improper input
+- Secure defaults for cookie settings
+
+This comprehensive breakdown demonstrates the technical architecture and capabilities of the Vibe Check application.
+Thank you for visiting!

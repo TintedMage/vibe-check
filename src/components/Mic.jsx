@@ -5,7 +5,7 @@ import { useEffect, useRef, useState } from 'react';
 /**
  * Microphone component that captures speech and converts it to text
  */
-export default function Mic({ onTranscript, onListeningChange, className, iconClass }) {
+export default function Mic({ onTranscript, onListeningChange, className, iconClass, onBeforeListening, disabled }) {
     // Store speech recognition instance
     const recognitionRef = useRef(null);
     // Track if currently recording
@@ -41,6 +41,7 @@ export default function Mic({ onTranscript, onListeningChange, className, iconCl
         // Handle recognition errors
         recognition.onerror = (event) => {
             console.error('Speech recognition error:', event.error);
+            alert(`Speech recognition error: ${event.error}`);
             setIsListening(false);
             if (onListeningChange) onListeningChange(false);
         };
@@ -89,19 +90,26 @@ export default function Mic({ onTranscript, onListeningChange, className, iconCl
 
         try {
             if (isListening) {
-                recognition.stop();  // Stop recording
-                // Manually update state in case onend doesn't fire immediately
+                // Always allow stopping regardless of disabled state
+                recognition.stop();
                 setIsListening(false);
                 if (onListeningChange) onListeningChange(false);
             } else {
-                recognition.start(); // Start recording
+                // Only check disabled and onBeforeListening when starting
+                if (disabled) return;
+
+                // Check with parent component if we can start recording
+                if (onBeforeListening && !onBeforeListening()) {
+                    return;
+                }
+
+                recognition.start();
             }
         } catch (error) {
             console.error('Error toggling microphone:', error);
             setIsListening(false);
             if (onListeningChange) onListeningChange(false);
         }
-
 
     };
 

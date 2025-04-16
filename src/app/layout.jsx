@@ -1,7 +1,8 @@
-
+import { Suspense } from 'react';
 import { SpeedInsights } from "@vercel/speed-insights/next"
 import Navbar from '@/components/Navbar';
 import CursorScript from '@/components/CursorScript';
+import FirstVisitAlert from '@/components/FirstVisitAlert';
 
 
 import { Barlow_Semi_Condensed, Montserrat, Borel } from 'next/font/google';
@@ -46,19 +47,20 @@ export const metadata = {
 
 export default function RootLayout({ children }) {
 
-    
 
 
     return (
         <html lang="en" data-bs-theme="dark" className={`${barlow.variable} ${montserrat.variable} ${borel.variable}`}>
             <body>
                 <div id='cursor'></div>
+                <FirstVisitAlert />
                 <Navbar />
-                {children}
+                {/* Wrap the page content in Suspense */}
+                <Suspense fallback={<div className="container pt-5 text-center">Loading page...</div>}> {/* You can customize the fallback UI */}
+                    {children}
+                </Suspense>
                 <CursorScript />
                 <SpeedInsights />
-
-
             </body>
         </html>
     );
