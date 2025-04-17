@@ -5,7 +5,7 @@ import { cookies } from 'next/headers';
 export async function POST(request) {
     console.log('Received request for sentiment analysis');
 
-    const cookieStore = cookies();
+    const cookieStore = await cookies();
     const apiKey = cookieStore.get('apiKey')?.value || process.env.HUGGING_FACE_API_KEY;
     console.log('API Key:', apiKey);
 

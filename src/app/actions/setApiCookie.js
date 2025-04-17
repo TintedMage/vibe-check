@@ -12,8 +12,11 @@ const setApiCookie = async (formData) => {
     }
 
     try {
+        // Get the cookie store first
+        const cookieStore = await cookies();
+
         // Set cookie with security options
-        cookies().set("apiKey", apiKey, {
+        cookieStore.set("apiKey", apiKey, {
             httpOnly: true,     // Prevents JavaScript access
             secure: process.env.NODE_ENV === "production",
             sameSite: "strict", // Prevents CSRF
@@ -21,14 +24,12 @@ const setApiCookie = async (formData) => {
             path: "/",
         });
 
-        // Give the cookie operation a moment to complete
-        await new Promise(resolve => setTimeout(resolve, 50));
-
         // Now check if the cookie was set successfully
-        const apiKeyCookie = cookies().get("apiKey");
+        const apiKeyCookie = cookieStore.get("apiKey");
 
         if (apiKeyCookie) {
-            cookies().set("apiKeyFlag", "true", {
+            // Set the flag cookie
+            cookieStore.set("apiKeyFlag", "true", {
                 secure: process.env.NODE_ENV === "production",
                 sameSite: "strict",
                 maxAge: 30 * 24 * 60 * 60,
@@ -37,13 +38,22 @@ const setApiCookie = async (formData) => {
             console.log("API key securely stored in cookie");
             return { success: true };
         } else {
-            cookies().set("apiKeyFlag", "false");
+            // Set the flag cookie to false
+            cookieStore.set("apiKeyFlag", "false", {
+                path: "/",
+                maxAge: 30 * 24 * 60 * 60,
+            });
             console.error("Failed to store API key");
             return { success: false, error: "Failed to store API key" };
         }
     } catch (error) {
         console.error("Error setting cookie:", error);
-        cookies().set("apiKeyFlag", "false");
+        // Set the flag cookie to false in case of error
+        const cookieStore = await cookies();
+        cookieStore.set("apiKeyFlag", "false", {
+            path: "/",
+            maxAge: 30 * 24 * 60 * 60,
+        });
         return { success: false, error: "Failed to store API key" };
     }
 }

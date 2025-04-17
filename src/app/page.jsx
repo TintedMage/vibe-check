@@ -1,6 +1,7 @@
 'use client';
 
 import { useState, useEffect, useCallback, useRef } from 'react';
+import Cookies from 'js-cookie';
 import styles from './page.module.css';
 import Mic from '@/components/Mic';
 import Transcript from '@/components/Transcript';
@@ -21,6 +22,12 @@ export default function Home({ }) {
 
     // Load credits from localStorage on mount
     useEffect(() => {
+
+        // Check for the apiKeyFlag cookie
+        const hasApiKey = Cookies.get('apiKeyFlag') === 'true';
+        setApiKey(hasApiKey);
+        console.log('API key present:', hasApiKey);
+
         try {
             // Only load if we haven't done so already
             if (!initialLoadDone.current) {
@@ -153,7 +160,7 @@ export default function Home({ }) {
             {/* Credits indicator */}
             <div className="pb-2 text-center">
                 <small className="text-muted">
-                    {apiKey && 'API Key Provided'}
+                    {apiKey && (<span className='text-success'>Api Key Provided!</span>)}
                     {!apiKey && remainingCredits > 0 && (
                         <>Free credits remaining: <span className="badge bg-dark fs-6">{remainingCredits}</span></>
                     )}
