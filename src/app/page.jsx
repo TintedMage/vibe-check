@@ -303,8 +303,7 @@ export default function Home({ }) {
                     <div className="">
                         <div className="row d-flex justify-content-around">
                             <div className="col-md-6 p-auto border-end px-5 ">
-                                {/* <Transcript value={listening ? finalTranscript + ' ' + interimTranscript : finalTranscript} /> */}
-                                <Transcript value={finalTranscript} />
+                                <Transcript value={listening ? finalTranscript + ' ' + interimTranscript : finalTranscript} />
                             </div>
                             <div className="col-md-6 px-auto p-3 ">
                                 <h3 className="mb-3 text-center"> {moodData.label !== "" ? moodData.emoji : ("Vibes!")}</h3>
