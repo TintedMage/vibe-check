@@ -2,11 +2,8 @@
 
 import styles from '../page.module.css';
 import Link from 'next/link';
-import { useState } from 'react';
 
 export default function About() {
-    const [activeTab, setActiveTab] = useState('journey');
-
     return (
         <div className={`${styles.container} container pt-5 mt-5 text-center`}>
             {/* Header with improved styling */}
@@ -52,7 +49,7 @@ export default function About() {
 
                         <div className="position-relative z-1">
                             <div className="d-inline-block mb-4 position-relative">
-                                <span className="badge bg-primary px-3 py-2 rounded-pill mb-3 fs-6">My Project</span>
+                                <span className="badge bg-primary px-3 py-2 rounded-pill mb-3 fs-6">Personal Project - 1</span>
                                 <div className="position-absolute top-100 start-50 translate-middle"
                                     style={{
                                         width: '80%',
@@ -69,8 +66,7 @@ export default function About() {
                                     <p className="lead mb-4 fw-normal">
                                         Vibe Check is my personal web application that analyzes the emotional tone of speech in real-time,
                                         helping understand the sentiment behind words.
-                                    </p>
-                                    <p className="mb-0">
+
                                         I built this using speech recognition technology and AI-powered sentiment analysis,
                                         transforming spoken words into actionable insights about emotional content.
                                     </p>
@@ -205,10 +201,7 @@ export default function About() {
                         </div>
                     </div>
 
-                    {/* Footer note */}
-                    <p className="text-muted small mt-5">
-                        Made with ❤️ by me | © {new Date().getFullYear()}
-                    </p>
+
                 </div>
             </div>
         </div >

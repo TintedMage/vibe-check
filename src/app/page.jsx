@@ -6,18 +6,97 @@ import styles from './page.module.css';
 import Mic from '@/components/Mic';
 import Transcript from '@/components/Transcript';
 
+
+function getVibeLevel({ positive, neutral, negative }) {
+    // console.log('Vibe Level:', { positive, neutral, negative });
+    const entries = [
+        { label: 'positive', score: positive },
+        { label: 'neutral', score: neutral },
+        { label: 'negative', score: negative }
+    ];
+
+    // console.log('Entries:', entries);
+
+    const top = entries.reduce((a, b) => b.score > a.score ? b : a);
+    const conf = top.score, sentiment = top.label;
+
+    if (sentiment === 'positive') {
+        if (conf > 0.9) return { label: "VIBE GOD", emoji: "✨", message: "You're radiating positivity!", sentiment };
+        if (conf > 0.6) return { label: "POSITIVE AF", emoji: "😊", message: "You're feeling pretty good.", sentiment };
+        return { label: "Mildly Positive", emoji: "🌤️", message: "A gentle breeze of good vibes.", sentiment };
+    }
+
+    if (sentiment === 'neutral') {
+        if (conf > 0.9) return { label: "Zen Mode", emoji: "🍵", message: "Completely unbothered. Inner peace unlocked.", sentiment };
+        return { label: "Neutral Vibe", emoji: "😐 ", message: "Not good, not bad. Just... existing.", sentiment };
+    }
+
+    if (sentiment === 'negative') {
+        if (conf > 0.9) return { label: "Vibe Emergency", emoji: "💀", message: "You're in the danger zone. Get snacks & hugs.", sentiment };
+        if (conf > 0.6) return { label: "Bad Vibes", emoji: "😞", message: "Tough moment. Take a deep breath.", sentiment };
+        return { label: "Slightly Off", emoji: "😕", message: "Not the worst, but definitely off.", sentiment };
+    }
+
+    return { label: "Unknown Vibe", emoji: "🤔❓", message: "Can't detect your vibe.", sentiment: "neutral" };
+}
+
+
+const MoodBackground = ({ sentiment }) => {
+    const backgrounds = {
+        positive: {
+            background: 'radial-gradient(circle at 30% 30%, rgba(40, 167, 69, 0.4) 0%, transparent 50%), radial-gradient(circle at 70% 70%, rgba(40, 167, 69, 0.3) 0%, transparent 50%), #0a0a0a'
+        },
+        negative: {
+            background: 'radial-gradient(circle at 30% 30%, rgba(220, 53, 69, 0.4) 0%, transparent 50%), radial-gradient(circle at 70% 70%, rgba(220, 53, 69, 0.3) 0%, transparent 50%), #0a0a0a'
+        },
+        neutral: {
+            background: 'radial-gradient(circle at 30% 30%, rgba(0, 49, 83, 0.4) 0%, transparent 50%), radial-gradient(circle at 70% 70%, rgba(0, 49, 83, 0.3) 0%, transparent 50%), #0a0a0a'
+        }
+    };
+
+    const currentSentiment = sentiment?.toLowerCase() || 'neutral';
+
+    return (
+        <div style={{
+            position: 'fixed',
+            top: 0,
+            left: 0,
+            right: 0,
+            bottom: 0,
+            zIndex: -1,
+            background: '#0a0a0a',
+        }}>
+            {Object.keys(backgrounds).map(mood => (
+                <div
+                    key={mood}
+                    style={{
+                        ...backgrounds[mood],
+                        position: 'absolute',
+                        top: 0,
+                        left: 0,
+                        right: 0,
+                        bottom: 0,
+                        opacity: mood === currentSentiment ? 1 : 0,
+                        transition: 'opacity 0.4s ease-in',
+                    }}
+                />
+            ))}
+        </div>
+    );
+};
+
 const MAX_FREE_CREDITS = 10;
 
 export default function Home({ }) {
     // Initialize ref to false to ensure initial load happens
     const initialLoadDone = useRef(false);
 
-    const [apiKey, setApiKey] = useState(false);
+    const [apiKey, setApiKey] = useState(true);
     const [creditsUsed, setCreditsUsed] = useState(0);
     const [finalTranscript, setFinalTranscript] = useState('');
     const [interimTranscript, setInterimTranscript] = useState('');
     const [listening, setListening] = useState(false);
-    const [moodData, setMoodData] = useState({ sentiment: '', confidence: 0 });
+    const [moodData, setMoodData] = useState({ label: "", emoji: "", message: "", sentiment: "" });
     const [fetchData, setFetchData] = useState(false);
 
     // Load credits from localStorage on mount
@@ -35,7 +114,7 @@ export default function Home({ }) {
                 const parsedCredits = storedCredits ? parseInt(storedCredits, 10) : 0;
 
                 setCreditsUsed(isNaN(parsedCredits) ? 0 : parsedCredits);
-                console.log('Credits loaded:', isNaN(parsedCredits) ? 0 : parsedCredits);
+                // console.log('Credits loaded:', isNaN(parsedCredits) ? 0 : parsedCredits);
 
                 // Mark initial load as complete
                 initialLoadDone.current = true;
@@ -51,7 +130,7 @@ export default function Home({ }) {
             // Only save after initial load to prevent overwriting with default values
             if (initialLoadDone.current) {
                 localStorage.setItem('creditsUsed', creditsUsed.toString());
-                console.log('Credits updated in storage:', creditsUsed);
+                // console.log('Credits updated in storage:', creditsUsed);
             }
         } catch (error) {
             console.error('Error updating localStorage:', error);
@@ -96,7 +175,7 @@ export default function Home({ }) {
     const getData = useCallback(async () => {
         if (!finalTranscript.trim()) {
             alert('No transcript captured. Please try again.');
-            console.warn('Recording stopped without capturing any text');
+            // console.warn('Recording stopped without capturing any text');
             return;
         }
 
@@ -113,12 +192,16 @@ export default function Home({ }) {
             }
 
             const data = await response.json();
-            setMoodData(data && typeof data === 'object' ? data : { sentiment: '', confidence: 0 });
+            // console.log('Sentiment analysis response:', data.negative, data.positive, data.neutral);
+            setMoodData(getVibeLevel({ positive: data.positive, neutral: data.neutral, negative: data.negative }));
+
         } catch (error) {
             console.error('Error fetching sentiment analysis:', error);
         } finally {
             setFetchData(false);
         }
+
+
     }, [finalTranscript]);
 
     useEffect(() => {
@@ -126,7 +209,7 @@ export default function Home({ }) {
             console.log('Stopped listening, analyzing sentiment...');
             getData();
         } else if (!listening && !finalTranscript.trim()) {
-            console.warn('Recording stopped without capturing any text');
+            // console.warn('Recording stopped without capturing any text');
         }
     }, [listening, getData, finalTranscript]);
 
@@ -147,10 +230,15 @@ export default function Home({ }) {
         return colors[label?.toLowerCase()] || '#007bff';
     };
 
+
+
     const remainingCredits = MAX_FREE_CREDITS - creditsUsed;
 
+
     return (
-        <div className={`${styles.container} container pt-5 mt-5`}>
+        <div className={`${styles.container} container pt-3 mt-5`}>
+            <MoodBackground sentiment={moodData.sentiment} />
+
             <div className="row justify-content-center">
                 <div className="col-12 text-center">
                     <h1 className={`${styles.heading} pt-5`}>Vibe Check</h1>
@@ -207,13 +295,15 @@ export default function Home({ }) {
                                 <Transcript value={listening ? finalTranscript + ' ' + interimTranscript : finalTranscript} />
                             </div>
                             <div className="col-md-6 px-auto p-3 ">
-                                <h3 className="mb-4 text-center">Vibes!</h3>
+                                <h3 className="mb-3 text-center"> {moodData.label !== "" ? moodData.emoji : ("Vibes!")}</h3>
                                 {moodData.sentiment && (
                                     <div className="text-center">
-                                        <h4 style={{ color: getMoodColor(moodData.sentiment) }}>{moodData.sentiment}</h4>
-                                        <p>Confidence: {Math.round(moodData.confidence)}%</p>
+                                        <span style={{ color: getMoodColor(moodData.label) }} className='d-block fs-5'>{moodData.label}</span>
+                                        <span className='d-block fs-6 pt-2'>{moodData.message}</span>
                                     </div>
                                 )}
+
+
                             </div>
                         </div>
                     </div>

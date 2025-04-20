@@ -2,6 +2,8 @@
 .navbar {
     padding-top: 3rem;
     overflow: hidden;
+    position: relative;
+    z-index: 11;
 }
 
 .navList {

@@ -1,25 +1,34 @@
 :root {
-    --background: #ffffff;
-    --foreground: #171717;
+    --background: #0a0a0a;
+    --foreground: #ededed;
+
+
 }
 
-@media (prefers-color-scheme: dark) {
-    :root {
-        --background: #0a0a0a;
-        --foreground: #ededed;
-    }
-}
+
+
 
 html,
 body {
     max-width: 100vw;
     overflow-x: hidden;
     font-size: 16px;
+    height: 100%;
+    background: radial-gradient(circle at 30% 30%, rgba(0, 49, 83, 0.4) 0%, transparent 50%), radial-gradient(circle at 70% 70%, rgba(0, 49, 83, 0.3) 0%, transparent 50%), #0a0a0a;
+
+
 }
+
+body * {
+    z-index: 10;
+    position: relative;
+}
+
+
+
 
 body {
     color: var(--foreground);
-    background: var(--background);
     font-family: "Barlow Semi Condensed", sans-serif;
     -webkit-font-smoothing: antialiased;
     -moz-osx-font-smoothing: grayscale;

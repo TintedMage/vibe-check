@@ -62,7 +62,7 @@ const Settings = () => {
         <div className="container py-5 d-flex flex-column align-items-center mt-5">
             <div className="row justify-content-center w-100">
                 <div className="col-md-8 col-lg-6">
-                    <div className="card bg-dark bg-opacity-25 border-0 shadow-lg mx-sm-5 mx-3">
+                    <div className="card bg-dark bg-opacity-25 border-0 shadow-md mx-sm-5 mx-3">
                         <div className="card-body p-4">
                             <div className="text-center mb-4">
                                 <h5 className="text-muted">API Key Configuration</h5>

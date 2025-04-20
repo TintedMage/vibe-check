@@ -3,6 +3,7 @@ import { SpeedInsights } from "@vercel/speed-insights/next"
 import Navbar from '@/components/Navbar';
 import CursorScript from '@/components/CursorScript';
 import FirstVisitAlert from '@/components/FirstVisitAlert';
+import Footer from '@/components/Footer';
 
 
 import { Barlow_Semi_Condensed, Montserrat, Borel } from 'next/font/google';
@@ -55,10 +56,12 @@ export default function RootLayout({ children }) {
                 <div id='cursor'></div>
                 <FirstVisitAlert />
                 <Navbar />
-                {/* Wrap the page content in Suspense */}
-                <Suspense fallback={<div className="container pt-5 text-center">Loading page...</div>}> {/* You can customize the fallback UI */}
-                    {children}
-                </Suspense>
+                <main className="flex-grow-1">
+                    <Suspense fallback={<div className="container pt-5 text-center">Loading page...</div>}>
+                        {children}
+                    </Suspense>
+                </main>
+                <Footer />
                 <CursorScript />
                 <SpeedInsights />
             </body>
