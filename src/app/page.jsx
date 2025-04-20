@@ -5,6 +5,7 @@ import Cookies from 'js-cookie';
 import styles from './page.module.css';
 import Mic from '@/components/Mic';
 import Transcript from '@/components/Transcript';
+import useDeviceDetect from '@/hooks/useDeviceDetect';
 
 
 function getVibeLevel({ positive, neutral, negative }) {
@@ -21,8 +22,8 @@ function getVibeLevel({ positive, neutral, negative }) {
     const conf = top.score, sentiment = top.label;
 
     if (sentiment === 'positive') {
-        if (conf > 0.9) return { label: "VIBE GOD", emoji: "✨", message: "You're radiating positivity!", sentiment };
-        if (conf > 0.6) return { label: "POSITIVE AF", emoji: "😊", message: "You're feeling pretty good.", sentiment };
+        if (conf > 0.9) return { label: "Extreamly Positive", emoji: "✨", message: "You're radiating positivity!", sentiment };
+        if (conf > 0.6) return { label: "Very Positive", emoji: "😊", message: "You're feeling pretty good.", sentiment };
         return { label: "Mildly Positive", emoji: "🌤️", message: "A gentle breeze of good vibes.", sentiment };
     }
 
@@ -91,13 +92,16 @@ export default function Home({ }) {
     // Initialize ref to false to ensure initial load happens
     const initialLoadDone = useRef(false);
 
-    const [apiKey, setApiKey] = useState(true);
+    const [apiKey, setApiKey] = useState(false);
     const [creditsUsed, setCreditsUsed] = useState(0);
     const [finalTranscript, setFinalTranscript] = useState('');
     const [interimTranscript, setInterimTranscript] = useState('');
     const [listening, setListening] = useState(false);
     const [moodData, setMoodData] = useState({ label: "", emoji: "", message: "", sentiment: "" });
     const [fetchData, setFetchData] = useState(false);
+
+    const { isMobile } = useDeviceDetect();
+
 
     // Load credits from localStorage on mount
     useEffect(() => {
@@ -187,9 +191,15 @@ export default function Home({ }) {
                 body: JSON.stringify({ text: finalTranscript }),
             });
 
+            console.log('Sentiment analysis response:', response);
+
+
             if (!response.ok) {
+                setCreditsUsed(prev => prev - 1);
+                alert("The credit has been refunded due to an error in the analysis. Please try again.");
                 throw new Error('Network response was not ok');
             }
+
 
             const data = await response.json();
             // console.log('Sentiment analysis response:', data.negative, data.positive, data.neutral);
@@ -226,9 +236,12 @@ export default function Home({ }) {
         const colors = {
             positive: '#28a745',
             negative: '#dc3545',
+            neutral: '#fff427',
         };
         return colors[label?.toLowerCase()] || '#007bff';
     };
+
+
 
 
 
@@ -292,13 +305,19 @@ export default function Home({ }) {
                     <div className="">
                         <div className="row d-flex justify-content-around">
                             <div className="col-md-6 p-auto border-end px-5 ">
-                                <Transcript value={listening ? finalTranscript + ' ' + interimTranscript : finalTranscript} />
+                                <Transcript
+                                    value={listening ? (
+                                        isMobile
+                                            ? finalTranscript
+                                            : finalTranscript + ' ' + interimTranscript
+                                    ) : finalTranscript}
+                                />
                             </div>
                             <div className="col-md-6 px-auto p-3 ">
                                 <h3 className="mb-3 text-center"> {moodData.label !== "" ? moodData.emoji : ("Vibes!")}</h3>
                                 {moodData.sentiment && (
                                     <div className="text-center">
-                                        <span style={{ color: getMoodColor(moodData.label) }} className='d-block fs-5'>{moodData.label}</span>
+                                        <span style={{ color: getMoodColor(moodData.sentiment) }} className='d-block fs-5'>{moodData.label}</span>
                                         <span className='d-block fs-6 pt-2'>{moodData.message}</span>
                                     </div>
                                 )}

@@ -32,7 +32,7 @@ const Settings = () => {
 
             if (result.success) {
                 setStatus({
-                    message: "API key saved successfully!",
+                    message: "API key saved successfully! You can go back to the home page.",
                     type: "success",
                     loading: false
                 });
