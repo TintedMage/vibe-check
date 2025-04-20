@@ -5,7 +5,7 @@ import Cookies from 'js-cookie';
 import styles from './page.module.css';
 import Mic from '@/components/Mic';
 import Transcript from '@/components/Transcript';
-import useDeviceDetect from '@/hooks/useDeviceDetect';
+// import useDeviceDetect from '@/hooks/useDeviceDetect';
 
 
 function getVibeLevel({ positive, neutral, negative }) {
@@ -100,7 +100,7 @@ export default function Home({ }) {
     const [moodData, setMoodData] = useState({ label: "", emoji: "", message: "", sentiment: "" });
     const [fetchData, setFetchData] = useState(false);
 
-    const { isMobile } = useDeviceDetect();
+    // const { isMobile } = useDeviceDetect();
 
 
     // Load credits from localStorage on mount
@@ -305,13 +305,7 @@ export default function Home({ }) {
                     <div className="">
                         <div className="row d-flex justify-content-around">
                             <div className="col-md-6 p-auto border-end px-5 ">
-                                <Transcript
-                                    value={listening ? (
-                                        isMobile
-                                            ? finalTranscript
-                                            : finalTranscript + ' ' + interimTranscript
-                                    ) : finalTranscript}
-                                />
+                                <Transcript value={listening ? finalTranscript + ' ' + interimTranscript : finalTranscript} />
                             </div>
                             <div className="col-md-6 px-auto p-3 ">
                                 <h3 className="mb-3 text-center"> {moodData.label !== "" ? moodData.emoji : ("Vibes!")}</h3>
