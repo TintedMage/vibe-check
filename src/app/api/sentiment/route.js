@@ -1,25 +1,26 @@
 import { NextResponse } from 'next/server';
-
 import { cookies } from 'next/headers';
 
 export async function POST(request) {
-    console.log('Received request for sentiment analysis');
-
-    const cookieStore = await cookies();
-    const apiKey = cookieStore.get('apiKey')?.value || process.env.HUGGING_FACE_API_KEY;
-    // console.log('API Key:', apiKey);
-
-
     try {
-        const { text } = await request.json();
+        console.log('✅ Received request for sentiment analysis');
+
+        const body = await request.json();
+        // console.log('Request body:', body);
+        // console.log('Request headers:', request.headers);
+
+        const { text } = body;
 
         if (!text || text.trim() === '') {
             return NextResponse.json({ error: 'No text provided' }, { status: 400 });
         }
 
-        // Call Hugging Face API for sentiment analysis
+        const cookieStore = await cookies(); // Awaiting cookies() as required
+        const apiKey = cookieStore.get('apiKey')?.value || process.env.HUGGING_FACE_API_KEY;
+
+        // Call Hugging Face API
         const response = await fetch(
-            "https://router.huggingface.co/hf-inference/models/cardiffnlp/twitter-roberta-base-sentiment-latest",
+            "https://router.huggingface.co/hf-inference/models/cardiffnlp/twitter-roberta-base-sentiment",
             {
                 method: "POST",
                 headers: {
@@ -36,16 +37,14 @@ export async function POST(request) {
         }
 
         const rawResult = await response.json();
-        // console.log('Raw result:', rawResult);
 
-        // Format the result for easier consumption
+        // Extract sentiment scores
         let formattedResult = {
             positive: 0,
             neutral: 0,
             negative: 0
         };
 
-        // Extract data from the nested array structure
         if (
             Array.isArray(rawResult) &&
             rawResult.length > 0 &&
@@ -60,10 +59,10 @@ export async function POST(request) {
             };
         }
 
-        // console.log(formattedResult);
+        console.log('✅ Sentiment analysis result:', formattedResult);
         return NextResponse.json(formattedResult);
     } catch (error) {
-        console.error('Error analyzing sentiment:', error);
+        console.error('❌ Error analyzing sentiment:', error);
         return NextResponse.json({ error: error.message }, { status: 500 });
     }
 }
